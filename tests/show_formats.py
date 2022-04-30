@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import ADFSlib
 import glob, os, sys
@@ -18,7 +18,7 @@ if __name__ == "__main__":
         
             try:
                 d = ADFSlib.ADFSdisc(open(path))
-                print path, d.disc_format()
+                print(path, d.disc_format())
             except ADFSlib.ADFS_exception:
                 sys.stderr.write("Unrecognised file: %s\n" % path)
     
