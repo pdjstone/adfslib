@@ -90,9 +90,8 @@ class Utilities:
         
         return new
     
-    def _safe(self, s, with_space = 0):
-    
-        new = ""
+    def _safe(self, s: bytes, with_space = 0) -> str:
+        new = b""
         if with_space == 1:
             lower = 31
         else:
@@ -108,9 +107,9 @@ class Utilities:
                 if c > 32:
                     new = new + chr(c)
             else:
-                new = new + i
+                new = new + bytes([i])
         
-        return new
+        return new.decode()
     
     def _plural(self, msg, values, words):
     
@@ -306,9 +305,11 @@ class ADFSfile:
 class ADFSmap(Utilities):
 
     def __getitem__(self, index):
-    
         return self.disc_map[index]
-    
+
+    def __contains__(self, index):
+        return index in self.disc_map
+
     def has_key(self, key):
     
         return key in self.disc_map
@@ -316,7 +317,7 @@ class ADFSmap(Utilities):
 
 class ADFSnewMap(ADFSmap):
 
-    dir_markers = ('Hugo', 'Nick')
+    dir_markers = (b'Hugo', b'Nick')
     root_dir_address = 0x800
     
     def __init__(self, header, begin, end, sectors, sector_size, record):
@@ -330,7 +331,8 @@ class ADFSnewMap(ADFSmap):
         
         self.free_space = self._read_free_space()
         self.disc_map = self._read_disc_map()
-    
+        self.verify = False
+
     def _read_disc_map(self):
     
         # See ADFS/EMaps.htm, ADFS/EFormat.htm and ADFS/DiscMap.htm for details.
@@ -557,7 +559,7 @@ class ADFSnewMap(ADFSmap):
         return free_space
     
     def read_catalogue(self, base):
-    
+
         head = base
         p = 0
         
@@ -576,9 +578,9 @@ class ADFSnewMap(ADFSmap):
         p = p + 5
         
         files = []
-        
+
         while self.sectors[head+p] != 0:
-        
+    
             old_name = self.sectors[head+p:head+p+10]
             top_set = 0
             counter = 1
@@ -666,7 +668,7 @@ class ADFSnewMap(ADFSmap):
                     # Remember that inddiscadd will be a sequence of
                     # pairs of addresses.
                     
-                    file = ""
+                    file = b""
                     remaining = length
                     
                     for start, end in inddiscadd:
@@ -777,7 +779,7 @@ class ADFSnewMap(ADFSmap):
 
 class ADFSbigNewMap(ADFSnewMap):
 
-    dir_markers = ('Nick',)
+    dir_markers = (b'Nick',)
     root_dir_address = 0xc8800
     
     def find_address_from_map(self, addr, begin, entry):
@@ -894,7 +896,7 @@ class ADFSdisc(Utilities):
             self.sector_size = 256
             interleave = 0
             self.disc_type = 'ads'
-            self.dir_markers = ('Hugo',)
+            self.dir_markers = (b'Hugo',)
         
         elif length == 327680:
             self.ntracks = 80
@@ -902,7 +904,7 @@ class ADFSdisc(Utilities):
             self.sector_size = 256
             interleave = 0
             self.disc_type = 'adm'
-            self.dir_markers = ('Hugo',)
+            self.dir_markers = (b'Hugo',)
         
         elif length == 655360:
             self.ntracks = 160
@@ -912,7 +914,7 @@ class ADFSdisc(Utilities):
             # sequenced.
             interleave = 1
             self.disc_type = 'adl'
-            self.dir_markers = ('Hugo',)
+            self.dir_markers = (b'Hugo',)
         
         elif length == 819200:
         
@@ -920,7 +922,7 @@ class ADFSdisc(Utilities):
             self.nsectors = 10
             self.sector_size = 1024
             interleave = 0
-            self.dir_markers = ('Hugo', 'Nick')
+            self.dir_markers = (b'Hugo', b'Nick')
             
             format = self._identify_format(adf)
             
@@ -942,7 +944,7 @@ class ADFSdisc(Utilities):
             self.sector_size = 1024
             interleave = 0
             self.disc_type = 'adEbig'
-            self.dir_markers = ('Nick',)
+            self.dir_markers = (b'Nick',)
         
         else:
             raise ADFS_exception('Please supply a .adf, .adl or .adD file.')
@@ -1083,7 +1085,7 @@ class ADFSdisc(Utilities):
         word2 = adf.read(4)
         adf.seek(0)
         
-        if word1 == 'Hugo':
+        if word1 == b'Hugo':
         
             if self.verify:
             
@@ -1095,7 +1097,7 @@ class ADFSdisc(Utilities):
             
             return 'D'
         
-        elif word1 == 'Nick':
+        elif word1 == b'Nick':
         
             if self.verify:
             
@@ -1107,7 +1109,7 @@ class ADFSdisc(Utilities):
             
             return 'D'
         
-        elif word2 == 'Nick':
+        elif word2 == b'Nick':
         
             if self.verify:
             
@@ -1192,7 +1194,7 @@ class ADFSdisc(Utilities):
         # DiscId
         disc_id   = self._read_unsigned_half_word(self.sectors[offset + 20 : offset + 22])
         # DiscName
-        disc_name = (self.sectors[offset + 22 : offset + 32]).decode().strip
+        disc_name = (self.sectors[offset + 22 : offset + 32]).decode().strip().encode()
         
         return {'sectors': nsectors, 'log2 sector size': log2_sector_size,
             'sector size': 2**log2_sector_size, 'heads': heads,
@@ -1204,7 +1206,7 @@ class ADFSdisc(Utilities):
     
         checksum = self.sectors[0]
         first_free = self._read_unsigned_half_word(self.sectors[1:3])
-        
+
         if self.disc_type == 'adE':
         
             self.record = self._read_disc_record(4)
@@ -1238,7 +1240,7 @@ class ADFSdisc(Utilities):
     
     def _read_tracks(self, f, inter):
     
-        t = ""
+        t = b""
         
         f.seek(0, 0)
         
@@ -1465,20 +1467,19 @@ class ADFSdisc(Utilities):
             print(path, "(empty)")
         
         for obj in files:
-    
+
             name = obj.name
             if isinstance(obj, ADFSfile):
             
                 if not filetypes:
                 
                     # Load and execution addresses treated as valid.
-                    print(string.expandtabs(
-                        "%s.%s\t%X\t%X\t%X" % (
+                    print("{}.{}\t{:08X}\t{:08X}\t{:X}".format(
                             path, name, obj.load_address,
                             obj.execution_address, obj.length
-                            ), 16
-                        ))
-                
+                            ).expandtabs(16)
+                        )
+
                 else:
                 
                     # Load address treated as a filetype; load and execution
@@ -1487,21 +1488,18 @@ class ADFSdisc(Utilities):
                     time_stamp = obj.time_stamp()
                     if not time_stamp or not obj.has_filetype():
                     
-                        print(string.expandtabs(
-                            "%s.%s\t%X\t%X\t%X" % (
+                        print("{}.{}\t{:08X}\t{:08X}\t{:X}".format(
                                 path, name, obj.load_address,
                                 obj.execution_address, obj.length
-                                ), 16
-                            ))
+                                ).expandtabs(16)
+                            )
                     else:
                     
                         time_stamp = time.strftime("%H:%M:%S, %a %m %b %Y", time_stamp)
-                        print(string.expandtabs(
-                            "%s.%s\t%s\t%s\t%X" % (
+                        print("{}.{}\t{}\t{}\t{:X}".format(
                                 path, name, obj.filetype().upper(), time_stamp,
-                                obj.length
-                                ), 16
-                            ))
+                                obj.length).expandtabs(16)
+                            )
             
             else:
             
