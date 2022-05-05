@@ -18,23 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from distutils.core import setup
-import sys
-
-try:
-
-    import cmdsyntax
-
-except ImportError:
-
-    print "Information:"
-    print
-    print "The cmdsyntax module is not installed. The ADF2INF.py utility"
-    print "will use getopt for its argument handling. You can install"
-    print "cmdsyntax later if you want."
-    print
-    print "See http://www.boddie.org.uk/david/Projects/Python/CMDSyntax"
-    print "for details of how to obtain the cmdsyntax module."
-
 
 import ADFSlib
 

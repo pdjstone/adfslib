@@ -19,46 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 import os, string, sys
+import getopt
 import ADFSlib
 
-try:
 
-    import cmdsyntax
-    use_getopt = 0
-
-except ImportError:
-
-    import getopt
-    use_getopt = 1
-
-
-__version__ = "0.42 (Sun 29th August 2010)"
+__version__ = "0.5 (Sun 5th May 2022)"
 
 default_convert_dict = {"/": "."}
-
-
-def read_cmdsyntax_input(argv, syntax):
-
-    syntax_obj = cmdsyntax.Syntax(syntax)
-    
-    matches, failed = syntax_obj.get_args(argv[1:], return_failed = 1)
-    
-    if len(matches) != 1 and cmdsyntax.use_GUI() != None:
-    
-        form = cmdsyntax.Form("ADF2INF", syntax_obj, failed[0])
-        
-        matches = form.get_args()
-    
-    # Take the first match, if possible.
-    if len(matches) > 0:
-    
-        match = matches[0]
-    
-    else:
-    
-        match = None
-    
-    return match
 
 
 def read_getopt_input(argv):
@@ -120,30 +87,10 @@ def read_getopt_input(argv):
 
 
 if __name__ == "__main__":
-    
-    if use_getopt == 0:
-    
-        syntax = """
-        \r( (-l | --list) [-t | --file-types] <ADF file> ) |
-        \r
-        \r( [-d | --create-directory]
-        \r  [ (-t | --file-types) [(-s separator) | --separator=character] ]
-        \r  [(-c convert) | --convert=characters]
-        \r  [-m | --time-stamps]
-        \r  <ADF file> <destination path> ) |
-        \r
-        \r( (-v | --verify) <ADF file> ) |
-        \r
-        \r(-h | --help)
-        """
-        
-        match = read_cmdsyntax_input(sys.argv, syntax)
-    
-    else:
-    
-        syntax = "[-l] [-d] [-t] [-s separator] [-v] [-c characters] [-m] " + \
-                 "<ADF file> <destination path>"
-        match = read_getopt_input(sys.argv)
+  
+    syntax = "[-l] [-d] [-t] [-s separator] [-v] [-c characters] [-m] " + \
+                "<ADF file> <destination path>"
+    match = read_getopt_input(sys.argv)
     
     if match == {} or match is None or \
         "h" in match or "help" in match:
