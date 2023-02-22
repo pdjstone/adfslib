@@ -982,7 +982,7 @@ class ADFSdisc(Utilities):
             
             # Find the root directory name and all the files and directories
             # contained within it. The 
-            self.root_name, self.files = self.disc_map.read_catalogue((self.ntracks * self.nsectors/2 + 2) * self.sector_size)
+            self.root_name, self.files = self.disc_map.read_catalogue((self.ntracks * self.nsectors//2 + 2) * self.sector_size)
         
         else:
         
