@@ -1731,3 +1731,21 @@ class ADFSdisc(Utilities):
     def disc_format(self):
     
         return self._format_names[self.disc_type]
+
+    def get_path(self, path) -> ADFSdirectory|ADFSfile:
+        """
+        Return an ADFSdirectory or ADFSpath for the given path (unix-style)
+        """
+        path = path.removeprefix('/').removesuffix('/')
+        cur = self.files
+        bits = path.split('/')
+        while bits:
+            p = bits.pop(0).lower()
+            f = next((f for f in cur if f.name.lower() == p), None)
+            if isinstance(f, ADFSfile) and bits:
+                print(' bad path')
+                return None
+            if isinstance(f, ADFSdirectory):
+                cur = f.files
+        return f
+        
