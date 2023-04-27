@@ -98,18 +98,11 @@ class Utilities:
             lower = 32
         
         for i in s:
-        
             if i <= lower:
                 break
             
-            if i >= 128:
-                c = i^128
-                if c > 32:
-                    new = new + chr(c)
-            else:
-                new = new + bytes([i])
-        
-        return new.decode()
+            new = new + bytes([i])
+        return new.decode('iso8859-1')
     
     def _plural(self, msg, values, words):
     
