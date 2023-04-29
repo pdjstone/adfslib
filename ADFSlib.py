@@ -636,7 +636,7 @@ class ADFSnewMap(ADFSmap):
                 
                     # Store a zero length file. This appears to be the
                     # standard behaviour for storing empty files.
-                    files.append(ADFSfile(name, "", load, exe, length))
+                    files.append(ADFSfile(name, b"", load, exe, length))
             
             else:
             
@@ -1621,6 +1621,9 @@ class ADFSdisc(Utilities):
                     
                     try:
                         out = open(out_file, "wb")
+                        if type(obj.data) == str:
+                            print(out_file)
+                            print(obj.data)
                         out.write(obj.data)
                         out.close()
                     except IOError:
