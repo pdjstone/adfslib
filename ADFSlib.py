@@ -102,7 +102,7 @@ class Utilities:
                 break
             
             new = new + bytes([i])
-        return new.decode('iso8859-1')
+        return new.decode('iso-8859-1')
     
     def _plural(self, msg, values, words):
     
