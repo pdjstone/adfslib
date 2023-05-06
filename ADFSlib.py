@@ -273,6 +273,14 @@ class ADFSfile:
         
         return "%03x" % ((self.load_address >> 8) & 0xfff)
     
+    def ro_ext(self):
+        """Returns either the filetype or loadaddres-execaddr
+        """
+        if self.has_filetype():
+            return self.filetype()
+        else:
+            return "{:08x}-{:08x}".format(self.load_address, self.execution_address)
+            
     def time_stamp(self):
     
         """Returns the time stamp for the file as a tuple of values containing
@@ -945,9 +953,6 @@ class ADFSdisc(Utilities):
         # Read tracks
         self.sectors = self._read_tracks(adf, interleave)
         
-        # Close the ADF file
-        adf.close()
-        
         # Set the default disc name.
         self.disc_name = 'Untitled'
         
@@ -1549,7 +1554,7 @@ class ADFSdisc(Utilities):
                 else:
                 
                     # Interpret the load address as a filetype.
-                    out_file = os.path.join(path, name) + separator + obj.filetype()
+                    out_file = os.path.join(path, name) + separator + obj.ro_ext()
                     
                     try:
                         out = open(out_file, "wb")
@@ -1617,7 +1622,7 @@ class ADFSdisc(Utilities):
                 else:
                 
                     # Interpret the load address as a filetype.
-                    out_file = path + os.sep + name + separator + obj.filetype()
+                    out_file = path + os.sep + name + separator + obj.ro_ext()
                     
                     try:
                         out = open(out_file, "wb")
