@@ -891,7 +891,7 @@ class ADFSdisc(Utilities):
         length = adf.tell()
         adf.seek(0,0)
         
-        if length == 163840:
+        if length <= 163840:
             self.ntracks = 40
             self.nsectors = 16
             self.sector_size = 256
@@ -899,7 +899,7 @@ class ADFSdisc(Utilities):
             self.disc_type = 'ads'
             self.dir_markers = (b'Hugo',)
         
-        elif length == 327680:
+        elif length <= 327680:
             self.ntracks = 80
             self.nsectors = 16
             self.sector_size = 256
@@ -907,7 +907,7 @@ class ADFSdisc(Utilities):
             self.disc_type = 'adm'
             self.dir_markers = (b'Hugo',)
         
-        elif length == 655360:
+        elif length <= 655360:
             self.ntracks = 160
             self.nsectors = 16        # per track
             self.sector_size = 256    # in bytes
@@ -917,7 +917,7 @@ class ADFSdisc(Utilities):
             self.disc_type = 'adl'
             self.dir_markers = (b'Hugo',)
         
-        elif length == 819200:
+        elif length <= 819200:
         
             self.ntracks = 80
             self.nsectors = 10
@@ -938,7 +938,7 @@ class ADFSdisc(Utilities):
             else:
                 raise ADFS_exception('Please supply a .adf, .adl or .adD file.')
         
-        elif length == 1638400:
+        elif length <= 1638400:
         
             self.ntracks = 80
             self.nsectors = 20
