@@ -813,7 +813,7 @@ class ADFSoldMap(ADFSmap):
         p = 0
         while self.sectors[base+p] != 0:
         
-            free.append(self._str2num(3, self.sectors[base+p:base+p+3]))
+            free_space.append(self._str2num(3, self.sectors[base+p:base+p+3]))
         
         name = self.sectors[self.sector_size-9:self.sector_size-4]
         
@@ -828,7 +828,7 @@ class ADFSoldMap(ADFSmap):
         p = 0
         while self.sectors[base+p] != 0:
         
-            free.append(self._str2num(3, self.sectors[base+p:base+p+3]))
+            free_space.append(self._str2num(3, self.sectors[base+p:base+p+3]))
         
         name = name + \
             self.sectors[base+self.sector_size-10:base+self.sector_size-5]
